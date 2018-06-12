@@ -4,11 +4,11 @@ const map = require('lodash/map');
 const path = require('path');
 
 /**
-  * @class ServicesCube
-  * @classdesc This cube is for instance and load services to the cano app core
-  * @extends Cube
-  * @author Antonio Mejias
-  */
+ * @class ServicesCube
+ * @classdesc This cube is for instance and load services to the cano app core
+ * @extends Cube
+ * @author Antonio Mejias
+ */
 class ServicesCube extends Cube {
 
     /**
@@ -44,7 +44,8 @@ class ServicesCube extends Cube {
         return new Promise((resolve) => {
             const requiredServices = requireAll(this.servicePath)
             map(requiredServices, (Service, fileName) => {
-                const service = new Service();
+                const service = typeof Service === 'function' ? new Service() : new Service.default();
+                global[fileName] = service;
                 this.bindToApp('services', fileName, service)
             })
             resolve()
@@ -60,6 +61,10 @@ class ServicesCube extends Cube {
     get servicePath() {
         return path.join(this.cano.app.paths.api, '/services')
     }
+}
+
+function setGlobal(key, value) {
+    global[key] = value;
 }
 
 module.exports = ServicesCube;
